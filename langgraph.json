@@ -1,0 +1,29 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent_not_deep": {
+      "path": "./graph_src/agent.py:agent_not_deep"
+    },
+    "agent": {
+      "path": "./graph_src/agent.py:make_graph"
+    },
+    "deepagent_demo": {
+      "path": "./graph_src/deepagent_example.py:deepagent_demo"
+    }
+  },
+  "http": {
+    "configurable_headers": {
+      "includes": [
+        "x-model-provider",
+        "x-system-prompt",
+        "x-enable-local-tools",
+        "x-enable-local-mcp",
+        "x-mcp-server",
+        "x-mcp-servers"
+      ],
+      "excludes": ["authorization", "x-api-key"]
+    }
+  },
+  "env": ".env",
+  "image_distro": "wolfi"
+}
