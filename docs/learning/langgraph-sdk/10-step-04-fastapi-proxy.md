@@ -1,15 +1,14 @@
-# Step 4：FastAPI 事件代理（学习辅助）
+# Step 4：FastAPI 事件代理（已并入服务主线）
 
-## 目标
+> 该步骤已并入独立目录 `docs/learning/langgraph-service-core/`。
 
-- 用 FastAPI 把 LangGraph 事件流透传给前端。
+请改看：
 
-## 任务
+- 契约定义：`docs/learning/langgraph-service-core/01-api-contract.md`
+- SSE 消费：`docs/learning/langgraph-service-core/02-sse-consume-model.md`
+- 验收方式：`docs/learning/langgraph-service-core/04-verification.md`
 
-1. 提供 `POST /api/chat/start`（创建/返回 thread_id）
-2. 提供 `GET /api/chat/stream`（SSE 转发 `runs.stream`）
-3. 提供 `GET /api/chat/state`（读取 `threads.get_state`）
+说明：
 
-## 完成标准
-
-- 浏览器能持续收到 SSE 事件，且 thread 状态可查询。
+- 本项目坚持最小能力主线：thread/wait/stream/state + done/error。
+- 事件消费优先官方 SDK 类型（`chunk.event` / `chunk.data` / `__interrupt__`）。

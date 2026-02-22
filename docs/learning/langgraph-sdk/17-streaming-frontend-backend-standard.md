@@ -13,7 +13,7 @@
 
 ## 1. 后端协议（当前项目）
 
-现状实现：`sdk_src/examples/langgraph_fastapi_observer.py`
+现状实现：`fastapi_src/app.py`（历史示例：`sdk_src/examples/langgraph_fastapi_observer.py`）
 
 - `GET /api/chat/stream`
 - SSE 透传：`event = chunk.event`，`data = chunk.data`

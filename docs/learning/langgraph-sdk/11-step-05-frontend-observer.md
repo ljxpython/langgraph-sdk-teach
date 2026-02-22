@@ -1,15 +1,20 @@
-# Step 5：前端观察面板（学习辅助）
+# Step 5：前端观察面板（迁移入口）
 
-## 目标
+> 本步骤已迁移到独立前端主线，避免与 SDK 主线耦合。
 
-- 前端可视化每一步 LangGraph 事件。
+请改为从这里开始：
 
-## 任务
+- `docs/learning/langgraph-frontend-core/README.md`
 
-1. Chat 面板：显示 `messages`
-2. Timeline 面板：显示 `updates/tasks/checkpoints/debug`
-3. State 面板：展示当前 thread state
+建议阅读顺序：
 
-## 完成标准
+1. `docs/learning/langgraph-frontend-core/00-overview.md`
+2. `docs/learning/langgraph-frontend-core/01-ui-scope.md`
+3. `docs/learning/langgraph-frontend-core/02-event-to-ui-mapping.md`
+4. `docs/learning/langgraph-frontend-core/03-hitl-interaction.md`
+5. `docs/learning/langgraph-frontend-core/04-verification.md`
 
-- 一次请求中可以看到从输入到输出的完整步骤轨迹。
+保留目标：
+
+- 前端可视化每一步 LangGraph 事件
+- 使用官方 `event/data/__interrupt__` 语义，不自定义协议层

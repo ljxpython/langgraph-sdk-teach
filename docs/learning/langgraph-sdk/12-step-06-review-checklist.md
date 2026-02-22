@@ -1,5 +1,7 @@
 # Step 6：复盘与验收
 
+> 前端验收细项已迁移到独立目录：`docs/learning/langgraph-frontend-core/04-verification.md`
+
 ## 验收清单
 
 - [ ] 我能解释 assistant/thread/run/state 的关系

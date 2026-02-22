@@ -7,6 +7,8 @@
 
 - `docs/learning/`：专门放学习型文档，不和项目设计文档混在一起。
 - `docs/learning/langgraph-sdk/`：聚焦 LangGraph API/SDK 主线。
+- 服务集成主线已拆到：`docs/learning/langgraph-service-core/`。
+- 前端实践主线已拆到：`docs/learning/langgraph-frontend-core/`。
 - 代码练习建议放在 `sdk_src/examples/`，文档和代码分离，便于迭代。
 
 ## 统一阅读序号（主线）
@@ -34,11 +36,12 @@
 18. `18-streaming-stage-s2-subgraphs-join-custom.md`（Streaming S2 进阶语义）
 19. `19-streaming-stage-s3-hitl-time-travel.md`（Streaming S3：HITL 与 Time Travel）
 20. `20-deepagent-canonical-example.md`（DeepAgent 规范案例）
+21. `21-execution-checklist-template.md`（执行清单模板）
 
 ## 当前进度
 
 - 你已完成：`05-step-03-stream-events.md`（Streaming 基础）
-- 你下一步：`20-deepagent-canonical-example.md`
+- 你下一步：`21-execution-checklist-template.md`
 
 ## 参考资料（按需）
 
@@ -48,6 +51,7 @@
 - `05-step-03-stream-events.md`
 - `10-step-04-fastapi-proxy.md`
 - `11-step-05-frontend-observer.md`
+- `../langgraph-frontend-core/README.md`
 - `12-step-06-review-checklist.md`
 - `13-assistants-api-playbook.md`
 - `14-verification-matrix.md`
@@ -56,12 +60,14 @@
 - `18-streaming-stage-s2-subgraphs-join-custom.md`
 - `19-streaming-stage-s3-hitl-time-travel.md`
 - `20-deepagent-canonical-example.md`
+- `21-execution-checklist-template.md`
 - `04-threads-api-playbook.md`
 - `03-runs-api-playbook.md`
 - `06-runtime-dynamic-config-playbook.md`
 - `07-local-mcp-playbook.md`
 - `08-langgraph-runtime-context-runnables-playbook.md`
 - `09-service-observer-playbook.md`
+- `../langgraph-service-core/README.md`
 
 ## 学习原则
 

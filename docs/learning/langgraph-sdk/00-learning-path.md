@@ -25,6 +25,7 @@
 18. `18-streaming-stage-s2-subgraphs-join-custom.md`（Streaming S2 进阶）
 19. `19-streaming-stage-s3-hitl-time-travel.md`（Streaming S3：HITL 与 Time Travel）
 20. `20-deepagent-canonical-example.md`（DeepAgent 规范案例）
+21. `21-execution-checklist-template.md`（执行清单模板）
 
 ## 能力顺序（理解导图）
 
@@ -39,7 +40,7 @@
 
 ## 每步怎么验证（必须留证据）
 
-当前建议进度：你已完成 `19`，下一步学习 **20（DeepAgent 规范案例）**。
+当前建议进度：你已完成 `20`，下一步执行 **21（Checklist 模板 + 回归验收）**。
 
 下一阶段官方文档（按顺序）：
 
@@ -131,7 +132,10 @@ uv run python sdk_src/examples/langgraph_sdk_learn.py thread-copy --thread-id <T
 - Streaming S2 自动化测试：`tests/test_streaming_stage_s2.py`
 - Streaming S3 自动化测试：`tests/test_streaming_stage_s3_hitl_time_travel.py`
 - DeepAgent 规范案例：`20-deepagent-canonical-example.md`
+- 执行清单模板：`21-execution-checklist-template.md`
 - Runs：`03-runs-api-playbook.md`
 - 动态配置：`06-runtime-dynamic-config-playbook.md`
 - 本地 MCP：`07-local-mcp-playbook.md`
 - 服务集成：`09-service-observer-playbook.md`
+- 服务主线（独立目录）：`../langgraph-service-core/README.md`
+- 前端主线（独立目录）：`../langgraph-frontend-core/README.md`
