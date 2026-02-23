@@ -31,6 +31,9 @@ class RuntimeOptions:
     enable_local_tools: bool = True
     enable_local_mcp: bool = False
     mcp_servers: list[str] | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
+    top_p: float | None = None
 
 
 def _parse_bool(value: Any, default: bool = False) -> bool:
@@ -41,6 +44,24 @@ def _parse_bool(value: Any, default: bool = False) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"1", "true", "yes", "on"}
     return bool(value)
+
+
+def _parse_float(value: Any, default: float | None = None) -> float | None:
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _parse_int(value: Any, default: int | None = None) -> int | None:
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _read_configurable(config: Mapping[str, Any] | None) -> Mapping[str, Any]:
@@ -158,8 +179,27 @@ def build_runtime_options(
             else configurable.get("x-mcp-server")
         )
     mcp_servers = _parse_mcp_servers(raw_servers)
+    if not enable_local_mcp:
+        mcp_servers = []
     if enable_local_mcp and not mcp_servers:
         mcp_servers = ["local_math"]
+
+    temperature = _parse_float(
+        context_data.get("temperature")
+        if "temperature" in context_data
+        else configurable.get("temperature"),
+        default=None,
+    )
+    top_p = _parse_float(
+        context_data.get("top_p") if "top_p" in context_data else configurable.get("top_p"),
+        default=None,
+    )
+    max_tokens = _parse_int(
+        context_data.get("max_tokens")
+        if "max_tokens" in context_data
+        else configurable.get("max_tokens"),
+        default=None,
+    )
 
     return RuntimeOptions(
         model_provider=model_provider,
@@ -167,6 +207,9 @@ def build_runtime_options(
         enable_local_tools=enable_local_tools,
         enable_local_mcp=enable_local_mcp,
         mcp_servers=mcp_servers,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        top_p=top_p,
     )
 
 
@@ -177,6 +220,19 @@ def resolve_model(model_provider: str):
     if provider in {"kimi", "mass_kimi"}:
         return get_kimi_model()
     return get_mass_glm_4_model()
+
+
+def apply_model_runtime_params(model: Any, options: RuntimeOptions) -> Any:
+    kwargs: dict[str, Any] = {}
+    if options.temperature is not None:
+        kwargs["temperature"] = options.temperature
+    if options.max_tokens is not None:
+        kwargs["max_tokens"] = options.max_tokens
+    if options.top_p is not None:
+        kwargs["top_p"] = options.top_p
+    if not kwargs:
+        return model
+    return model.bind(**kwargs)
 
 
 @tool
@@ -252,10 +308,12 @@ async def build_agent_from_config(
 
     if options.enable_local_tools:
         tools.extend(get_local_tools())
-    tools.extend(await get_mcp_tools(options.mcp_servers or []))
+    if options.enable_local_mcp:
+        tools.extend(await get_mcp_tools(options.mcp_servers or []))
 
+    runtime_model = apply_model_runtime_params(resolve_model(options.model_provider), options)
     return create_agent(
-        model=resolve_model(options.model_provider),
+        model=runtime_model,
         tools=tools,
         system_prompt=options.system_prompt,
     )
