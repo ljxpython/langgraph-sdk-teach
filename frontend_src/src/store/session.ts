@@ -1,9 +1,9 @@
 export type SessionState = {
-  userId: string
-  threadId: string | null
+  user_id: string
+  thread_id: string | null
 }
 
 export const initialSessionState: SessionState = {
-  userId: 'u-demo',
-  threadId: null,
+  user_id: 'u-demo',
+  thread_id: null,
 }
