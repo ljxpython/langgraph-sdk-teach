@@ -53,3 +53,17 @@ class RunLogRepository:
             ).fetchall()
             self._logger.debug("repo.run_log.list user_id=%s count=%s", user_id, len(rows))
             return [dict(row) for row in rows]
+
+    def list_by_thread(self, thread_id: str) -> list[dict[str, Any]]:
+        with get_connection(self._db_path) as conn:
+            rows = conn.execute(
+                """
+                SELECT id, user_id, thread_id, run_id, endpoint, event, status, error, created_at
+                FROM run_logs
+                WHERE thread_id = ?
+                ORDER BY id ASC
+                """,
+                (thread_id,),
+            ).fetchall()
+            self._logger.debug("repo.run_log.list thread_id=%s count=%s", thread_id, len(rows))
+            return [dict(row) for row in rows]

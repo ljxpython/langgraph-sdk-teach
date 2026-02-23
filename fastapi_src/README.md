@@ -5,10 +5,26 @@
 ## 当前能力
 
 - `POST /api/thread`：按 `user_id` 创建/复用 `thread_id`
+- `POST /api/thread/new`：显式新建 `thread_id`（可选绑定 `user_id`）
+- `GET /api/threads`：读取 threads 列表（threadId 驱动会话）
 - `POST /api/chat/wait`：调用 `runs.wait` 返回最终结果
 - `POST /api/chat/resume`：提交 `command.resume` 恢复 HITL 流程
 - `GET /api/chat/stream`：SSE 透传 `chunk.event/chunk.data`，补 `done/error`
-- `GET /api/state`：回读 `threads.get_state`
+- `GET /api/state`：回读 `threads.get_state`（支持 `thread_id` 或 `user_id`）
+- `GET /api/messages`：从 `threads.get_state.values.messages` 归一化消息列表（支持 `thread_id` 或 `user_id` + `limit/offset`）
+- `GET /api/history`：回读 `threads.get_history`（支持 `thread_id` 或 `user_id`）
+- `GET /api/assistants`：列出 assistant 原语义字段（`assistant_id/graph_id/name`）
+- `GET /api/graphs`：列出可选 `graph_id`（本地 `langgraph.json` + 远端 assistants）
+- `GET /api/assistants/{assistant_id}`：读取单个 assistant
+- `POST /api/assistants`：创建 assistant（基于 `graph_id`）
+- `PATCH /api/assistants/{assistant_id}`：更新 assistant
+- `DELETE /api/assistants/{assistant_id}`：删除 assistant（可选 `delete_threads`）
+
+运行时开关约定：
+
+- `enable_local_tools` 默认 `true`
+- `enable_local_mcp` 默认 `false`
+- 当 `enable_local_mcp=false` 时，即使传了 `mcp_servers` 也不会加载 MCP tools
 - `run_logs`：写入 wait/stream 关键事件日志（SQLite）
 - `logging`：统一日志模块 + 请求日志中间件（含 `x-request-id`）
 
