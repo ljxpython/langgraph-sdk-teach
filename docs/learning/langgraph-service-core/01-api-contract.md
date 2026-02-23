@@ -21,3 +21,5 @@
 
 - 不改写官方事件类型（`messages*`、`updates`、`tasks`、`checkpoints`、`debug` 等）
 - `join_stream` 仅看加入后的尾流，不做历史补发承诺
+- 动态模型参数统一走 `context`（`temperature/max_tokens/top_p/system_prompt`）
+- 若请求同时包含 `context` 与 `config.configurable`，后端执行 context-only 归一化

@@ -9,6 +9,44 @@
 - [ ] 提交审批后流程可恢复至 `done/error`
 - [ ] State 面板可回读本轮输入
 
+### HITL 中断触发用例（`__interrupt__`）
+
+前置：`assistant_id=deepagent_demo`
+
+### 子 agent / 工具调用触发用例（可长期复用）
+
+前置：`assistant_id=deepagent_demo`
+
+1. 子 agent（`task`）触发
+
+`请把“做一个前端平台改版”拆成3个子任务，并分别委托子代理执行后汇总结果。`
+
+2. 工具调用（`write_todos`）触发
+
+`请先创建一个待办清单：1) 调研 LangGraph stream_mode；2) 写出验证步骤；3) 输出风险项，然后继续执行。`
+
+3. 文件工具（`write_file`/`edit_file`）触发
+
+`请新建 docs/tmp_hitl_demo.md，写入“这是一次 HITL 测试”，然后把第一行改成“已通过 HITL 审批测试”。`
+
+观察点：
+
+- `Chat Panel` 出现 `tool_request/tool_result/state_progress`
+- 命中中断时出现 `__interrupt__`
+- 点击 `Approve Resume` 后继续执行到 `done/error`
+
+推荐指令（按顺序）：
+
+1. `请先创建一个待办清单：1) 调研 LangGraph stream_mode；2) 写出验证步骤；3) 输出风险项，然后继续执行。`
+2. `请新建一个文件 docs/tmp_hitl_demo.md，内容包含“这是一次 HITL 测试”，并继续后续步骤。`
+3. `请把 docs/tmp_hitl_demo.md 的第一行改成“已通过 HITL 审批测试”，然后继续执行。`
+
+验收预期：
+
+- [ ] 运行中出现 `__interrupt__` / `human_review_required`
+- [ ] 点击 `Approve Resume` 后能继续执行
+- [ ] 最终进入 `done` 或 `error` 终态
+
 ## 初始化阶段验收
 
 - [ ] `frontend_src/` 已完成 React + TS + Vite 初始化

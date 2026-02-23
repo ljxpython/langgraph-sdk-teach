@@ -75,6 +75,15 @@ uv run --with pytest pytest tests/test_streaming_stage_s1.py tests/test_streamin
 - [ ] 一页“`__interrupt__` 审批流程”说明
 - [ ] 一份最新回归日志（含 `thread_id/run_id`）
 
+## K. Auth（身份与访问控制）起步清单
+
+- [ ] 已阅读 `https://docs.langchain.com/langsmith/auth`
+- [ ] 能清晰区分 401（认证失败）和 403（授权失败）
+- [ ] 已定义最小身份结构：`identity/permissions/role/org_id`
+- [ ] 已定义至少 1 条资源授权规则（建议 `threads.create`）
+- [ ] 已定义 owner 写入与过滤策略
+- [ ] 已准备 3 组验证样例：无凭证、低权限、跨 owner 访问
+
 ## 本次执行记录（可追加）
 
 - 执行人：`<name>`

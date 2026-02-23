@@ -37,11 +37,23 @@
 19. `19-streaming-stage-s3-hitl-time-travel.md`（Streaming S3：HITL 与 Time Travel）
 20. `20-deepagent-canonical-example.md`（DeepAgent 规范案例）
 21. `21-execution-checklist-template.md`（执行清单模板）
+22. `22-context-only-policy-and-pitfalls.md`（Context 策略与踩坑总结）
+23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
 
 ## 当前进度
 
 - 你已完成：`05-step-03-stream-events.md`（Streaming 基础）
 - 你下一步：`21-execution-checklist-template.md`
+- 并行专项（现在开始）：LangSmith Auth（身份控制 + 访问控制）
+
+## 新增学习专项（已启动）
+
+- 官方入口：`https://docs.langchain.com/langsmith/auth`
+- 学习目标：
+  - 分清 `Authentication`（你是谁）与 `Authorization`（你能做什么）。
+  - 能设计最小鉴权闭环：401（认证失败）与 403（授权失败）语义清晰。
+  - 能设计 owner 资源隔离策略：创建时写入 owner，读取时按 owner 过滤。
+- 执行文档：`15-study-plan.md`（已补充 Auth 专项计划与起步任务）
 
 ## 参考资料（按需）
 
@@ -61,6 +73,8 @@
 - `19-streaming-stage-s3-hitl-time-travel.md`
 - `20-deepagent-canonical-example.md`
 - `21-execution-checklist-template.md`
+- `22-context-only-policy-and-pitfalls.md`
+- `23-langsmith-auth-self-hosted-study-plan.md`
 - `04-threads-api-playbook.md`
 - `03-runs-api-playbook.md`
 - `06-runtime-dynamic-config-playbook.md`
@@ -74,6 +88,7 @@
 - 主线只学 LangGraph API/SDK。
 - FastAPI 和前端仅作为观察工具。
 - 每步都要求「可运行证据」。
+- Auth 专项同样要留证据：至少包含 401、403、owner 隔离三类验证记录。
 
 ## 学习脚本结构（已拆分）
 

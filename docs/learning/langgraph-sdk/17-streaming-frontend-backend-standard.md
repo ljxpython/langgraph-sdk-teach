@@ -170,7 +170,7 @@ else:
 ## 6. 边界与坑位
 
 1. `join_stream` 不会补发加入前的历史事件；加入时机偏晚时可能观测到 0 条尾流事件。
-2. 单次 run 请求中不要同时混用 `context` 与 `configurable`。
+2. 单次 run 请求中不要同时混用 `context` 与 `configurable`；动态参数统一走 `context`。
 3. Python < 3.11 的 async 场景有额外 streaming 约束（官方已说明）。
 
 ## 7. 测试映射
@@ -185,6 +185,6 @@ else:
 
 执行：
 
-```bash
+```wbash
 uv run --with pytest pytest tests/test_streaming_stage_s1.py tests/test_streaming_stage_s2.py tests/test_streaming_stage_s3_hitl_time_travel.py tests/test_streaming_stage_s4_unified_contract.py -vv -s
 ```

@@ -11,6 +11,12 @@
 04. `04-verification.md`（验收清单）
 05. `05-init-and-structure-plan.md`（初始化与目录落地计划）
 06. `06-frontend-backend-contract-v1.md`（联调契约 v1）
+07. `07-platform-ui-design.md`（平台化 UI 设计方案）
+08. `08-ui-refactor-checklist.md`（前端改造清单）
+09. `09-ai-platform-core-feature-and-call-chain.md`（平台功能清单与调用链）
+10. `10-controls-field-and-call-mapping.md`（Controls 字段能力与调用映射）
+11. `11-platform-replication-playbook.md`（平台能力复刻手册）
+12. `12-thinking-observability-adaptation.md`（Thinking 可视化适配）
 
 ## 设计原则
 

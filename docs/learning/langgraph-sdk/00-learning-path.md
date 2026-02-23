@@ -26,6 +26,8 @@
 19. `19-streaming-stage-s3-hitl-time-travel.md`（Streaming S3：HITL 与 Time Travel）
 20. `20-deepagent-canonical-example.md`（DeepAgent 规范案例）
 21. `21-execution-checklist-template.md`（执行清单模板）
+22. `22-context-only-policy-and-pitfalls.md`（Context 策略与踩坑）
+23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
 
 ## 能力顺序（理解导图）
 
@@ -42,11 +44,49 @@
 
 当前建议进度：你已完成 `20`，下一步执行 **21（Checklist 模板 + 回归验收）**。
 
+并行新增专项：**LangSmith Auth（身份控制 + 访问控制）**。
+
 下一阶段官方文档（按顺序）：
 
 1. https://docs.langchain.com/langsmith/streaming
 2. https://docs.langchain.com/langsmith/add-human-in-the-loop
 3. https://docs.langchain.com/langsmith/human-in-the-loop-time-travel
+4. https://docs.langchain.com/langsmith/auth
+
+## Auth 专项起步（现在开始）
+
+### A1) 先建立边界
+
+- 认证（Authentication）：回答“你是谁”。
+- 授权（Authorization）：回答“你能访问什么”。
+- 通过标准：你能用自己的话分别举 1 个失败场景（401 vs 403）。
+
+### A2) 最小认证闭环
+
+- 学习点：`@auth.authenticate` 返回最小用户身份结构。
+- 通过标准：
+  - 无效凭证 -> 401
+  - 有效凭证 -> identity 稳定可识别
+
+### A3) 最小授权闭环
+
+- 学习点：`@auth.on` 与资源动作规则（建议先从 `threads.create` 入手）。
+- 通过标准：
+  - 无权限 -> 403
+  - 有权限 -> 请求通过
+
+### A4) owner 归属隔离
+
+- 学习点：资源创建时注入 owner，读取按 owner 过滤。
+- 通过标准：
+  - 同 owner 可读
+  - 非 owner 被拒绝或不可见
+
+### A5) 常见错误语义校验
+
+- 401: 认证失败（凭证缺失/无效）
+- 403: 已认证但无权限
+- 通过标准：接口返回语义和错误码一致，不混淆
 
 ### 1) 对象模型
 
@@ -133,6 +173,8 @@ uv run python sdk_src/examples/langgraph_sdk_learn.py thread-copy --thread-id <T
 - Streaming S3 自动化测试：`tests/test_streaming_stage_s3_hitl_time_travel.py`
 - DeepAgent 规范案例：`20-deepagent-canonical-example.md`
 - 执行清单模板：`21-execution-checklist-template.md`
+- Context 策略与踩坑：`22-context-only-policy-and-pitfalls.md`
+- Self-hosted Auth 详细学习规划：`23-langsmith-auth-self-hosted-study-plan.md`
 - Runs：`03-runs-api-playbook.md`
 - 动态配置：`06-runtime-dynamic-config-playbook.md`
 - 本地 MCP：`07-local-mcp-playbook.md`
