@@ -1,0 +1,4 @@
+p, role:admin, /api/threads, POST
+p, role:admin, /api/threads/:thread_id, GET
+p, role:user, /api/threads, POST
+p, role:user, /api/threads/:thread_id, GET
