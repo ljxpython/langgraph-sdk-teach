@@ -39,6 +39,8 @@
 21. `21-execution-checklist-template.md`（执行清单模板）
 22. `22-context-only-policy-and-pitfalls.md`（Context 策略与踩坑总结）
 23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
+24. `24-langsmith-custom-auth-hands-on.md`（Custom Auth 实操手册）
+25. `25-supabase-oauth-e2e-playbook.md`（Supabase OAuth 端到端实战）
 
 ## 当前进度
 
@@ -75,6 +77,8 @@
 - `21-execution-checklist-template.md`
 - `22-context-only-policy-and-pitfalls.md`
 - `23-langsmith-auth-self-hosted-study-plan.md`
+- `24-langsmith-custom-auth-hands-on.md`
+- `25-supabase-oauth-e2e-playbook.md`
 - `04-threads-api-playbook.md`
 - `03-runs-api-playbook.md`
 - `06-runtime-dynamic-config-playbook.md`

@@ -22,6 +22,7 @@
   - query 参数更新 -> 运行上下文切换
 - Sink
   - `useStream` 的 `threadId: threadId ?? null`：`example/ui_demo/src/providers/Stream.tsx:107`
+  - 历史恢复开关 `fetchStateHistory: true`：`example/ui_demo/src/providers/Stream.tsx:108`
 
 ## 3) 用户发送消息流
 
@@ -40,11 +41,11 @@
 
 - regenerate
   - Source: 点击刷新按钮（AI 消息操作条）
-  - Transform: 从 metadata 读取 parent checkpoint：`example/ui_demo/src/components/thread/messages/ai.tsx:123`
+  - Transform: 从 metadata 读取 parent checkpoint：`example/ui_demo/src/components/thread/messages/ai.tsx:126`
   - Sink: `submit(undefined, { checkpoint })`：`example/ui_demo/src/components/thread/index.tsx:245`
 - edit
   - Source: human 消息进入编辑态
-  - Transform: 生成新 human message + parent checkpoint：`example/ui_demo/src/components/thread/messages/human.tsx:51`
+  - Transform: 生成新 human message + parent checkpoint：`example/ui_demo/src/components/thread/messages/human.tsx:46`
   - Sink: `thread.submit({messages:[newMessage]}, ...)`：`example/ui_demo/src/components/thread/messages/human.tsx:56`
 
 ## 5) interrupt 决策流
@@ -57,7 +58,7 @@
   - 非 inbox -> `GenericInterruptView`
 - Sink
   - 单 action resume：`example/ui_demo/src/components/thread/agent-inbox/hooks/use-interrupted-actions.tsx:89`
-  - resolve：`example/ui_demo/src/components/thread/agent-inbox/hooks/use-interrupted-actions.tsx:191`
+  - resolve（`goto: END`）：`example/ui_demo/src/components/thread/agent-inbox/hooks/use-interrupted-actions.tsx:191`
   - 多 action 批量 resume：`example/ui_demo/src/components/thread/agent-inbox/components/thread-actions-view.tsx:225`
 
 ## 6) 分支切换流

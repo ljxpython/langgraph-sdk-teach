@@ -33,6 +33,8 @@
 - `streamResumable: true`：允许运行中断后继续
 - `optimisticValues`：本地立即先显示，降低等待感
 
+补充：`fetchStateHistory: true` 是在 `useTypedStream({...})` 初始化时配置的，不是 `submit` 时传入。
+
 ### 2.3 stream 消费
 
 `useStream` 持续更新 `messages` 与 `values`，组件层自动重渲染：
@@ -67,13 +69,13 @@
 ### 4.2 历史线程切换
 
 `ThreadHistory` 点击条目后写 query `threadId`。
-`useStream(fetchStateHistory: true)` 会按 thread 上下文恢复历史状态。
+`StreamProvider` 初始化时启用 `fetchStateHistory: true`，因此会按 thread 上下文自动恢复历史状态。
 
 ## 5) 分支与重跑生命周期
 
 1. 分支切换：`thread.setBranch(branch)`
-2. regenerate：带 `checkpoint` 调 `submit(undefined, {...})`
-3. human message edit：在父 checkpoint 上提交新的 human 内容
+2. regenerate（AI 消息）：从 `meta.firstSeenState.parent_checkpoint` 取父检查点后调用 `submit(undefined, {...})`
+3. human message edit：同样基于父 checkpoint 提交新的 human 内容
 
 这三条都依赖 `getMessagesMetadata(message)` 返回的 metadata。
 
@@ -86,9 +88,13 @@
 3. 命中则走 `ThreadView`（带 approve/edit/reject UI）
 4. 最终通过 command 提交：
    - `resume: { decisions }`
-   - 或 `goto: END`（标记 resolved）
+   - 或 `goto: END`（直接标记 resolved，跳过后续执行）
 
-支持多 action 批量决策（`thread-actions-view.tsx`）。
+支持多 action 批量决策（`thread-actions-view.tsx`）：
+
+- 可先逐个保存 decision，再统一 `Submit all`
+- 若所有 action 都允许 `approve`，可一键 `Approve All`
+- `review_config.args_schema` 可用于约束可编辑参数结构
 
 ## 7) 多模态输入生命周期（图片/PDF）
 

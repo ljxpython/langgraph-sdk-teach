@@ -1,53 +1,57 @@
 # 05. 官方参考索引
 
-下面这些是学习 `example/ui_demo` 时最值得反复看的官方材料。
+下面给出 10 条高信号官方资料，每条都映射到 `example/ui_demo` 的对应实现位置。
 
-## 1) 项目源码与说明
+## 1) 10 条官方资料（URL + 对应代码）
 
-1. Agent Chat UI 仓库
-   - https://github.com/langchain-ai/agent-chat-ui
-2. 项目 README（包含生产化说明）
-   - https://github.com/langchain-ai/agent-chat-ui/blob/main/README.md
+1. https://github.com/langchain-ai/agent-chat-ui
+   - 作用：项目总入口与目录基线。
+   - 对应代码：`example/ui_demo/src/app/page.tsx`
 
-## 2) React useStream 官方资料
+2. https://github.com/langchain-ai/agent-chat-ui/blob/main/README.md
+   - 作用：生产化章节（passthrough 与 custom auth 迁移路线）。
+   - 对应代码：`example/ui_demo/src/app/api/[..._path]/route.ts`
 
-1. Frontend Streaming（官方，含 `useStream` 参数与返回值）
-   - https://docs.langchain.com/oss/javascript/langchain/streaming/frontend
-2. Agent Chat UI（官方能力说明）
-   - https://docs.langchain.com/oss/javascript/langgraph/ui
-3. JS API Reference（LangGraph.js）
-   - https://langchain-ai.github.io/langgraphjs/reference/index.html
+3. https://docs.langchain.com/oss/javascript/langgraph/ui
+   - 作用：Agent Chat UI 官方能力总览。
+   - 对应代码：`example/ui_demo/src/components/thread/index.tsx`
 
-## 3) Generative UI（react-ui）
+4. https://docs.langchain.com/oss/javascript/langchain/streaming/frontend
+   - 作用：`useStream` 参数/返回值、branching、interrupt、optimistic update。
+   - 对应代码：`example/ui_demo/src/providers/Stream.tsx`
 
-1. Generative UI in React（`uiMessageReducer` / `LoadExternalComponent`）
-   - https://docs.langchain.com/langgraph-platform/generative-ui-react
+5. https://docs.langchain.com/langgraph-platform/generative-ui-react
+   - 作用：`onCustomEvent + uiMessageReducer + LoadExternalComponent` 官方模式。
+   - 对应代码：`example/ui_demo/src/components/thread/messages/ai.tsx`
 
-## 4) 生产代理与鉴权
+6. https://docs.langchain.com/langgraph-platform/auth
+   - 作用：平台 AuthN/AuthZ 机制与资源级访问控制语义。
+   - 对应代码：`docs/learning/agent-chat-ui/08-local-to-production-migration.md`
 
-1. Next.js API passthrough 包（NPM）
-   - https://www.npmjs.com/package/langgraph-nextjs-api-passthrough
-2. 对应 GitHub（README 含注意事项）
-   - https://github.com/bracesproul/langgraph-nextjs-api-passthrough
-3. Auth & Access Control（平台文档）
-   - https://docs.langchain.com/langgraph-platform/auth
-4. Custom Authentication（文档）
-   - https://docs.langchain.com/langsmith/custom-auth
-5. LangGraph 平台 Custom Auth 入门
-   - https://docs.langchain.com/langgraph-platform/custom-auth
-6. LangGraph Python 自定义鉴权入门
-   - https://langchain-ai.github.io/langgraph/tutorials/auth/getting_started/
-7. LangGraphJS TypeScript 自定义鉴权
-   - https://langchain-ai.github.io/langgraphjs/how-tos/auth/custom_auth/
+7. https://docs.langchain.com/langgraph-platform/custom-auth
+   - 作用：LangGraph 平台 custom auth 的实现入口。
+   - 对应代码：`example/ui_demo/src/providers/Stream.tsx`
 
-## 5) 重要结论（外部资料交叉验证）
+8. https://docs.langchain.com/langsmith/custom-auth
+   - 作用：部署侧自定义鉴权与用户上下文注入。
+   - 对应代码：`docs/learning/agent-chat-ui/03-production-and-extension-points.md`
 
-1. `useStream` 官方明确支持：branching、interrupt、optimistic update、custom events。
-2. Generative UI 官方推荐模式就是本项目用的：`onCustomEvent + uiMessageReducer + LoadExternalComponent`。
-3. `langgraph-nextjs-api-passthrough` 仓库 README 已明确：更推荐迁移到 LangGraph custom auth。
+9. https://www.npmjs.com/package/langgraph-nextjs-api-passthrough
+   - 作用：Next.js 代理包说明与 API 透传方式。
+   - 对应代码：`example/ui_demo/src/app/api/[..._path]/route.ts`
 
-## 6) 阅读策略（建议）
+10. https://github.com/bracesproul/langgraph-nextjs-api-passthrough
+    - 作用：透传包源码与 README 注意事项（并指出 custom auth 的长期方向）。
+    - 对应代码：`example/ui_demo/src/app/api/[..._path]/route.ts`
 
-1. 先看本地代码：`Stream.tsx`、`Thread.tsx`、`thread/index.tsx`
-2. 再对照 `useStream` 官方文档，确认每个 options 的语义
-3. 最后看生产化章节（passthrough/custom auth），决定你自己的上线路径
+## 2) 交叉结论
+
+1. `useStream` 是 `ui_demo` 的运行时核心，覆盖消息流、分支、中断、恢复。
+2. Generative UI 在本项目中严格遵循官方推荐范式。
+3. passthrough 适合快速上线，长期应迁移到 custom auth。
+
+## 3) 阅读顺序建议
+
+1. 先读 `Stream.tsx` 与 `thread/index.tsx`。
+2. 再对照第 4、5 条文档确认流式与 UI 事件语义。
+3. 最后读第 6~10 条完成生产化路线选择。

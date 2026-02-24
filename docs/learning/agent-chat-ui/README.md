@@ -13,6 +13,9 @@
 06. `06-component-map.md`（组件依赖图与职责矩阵）
 07. `07-dataflow-matrix.md`（Source -> Transform -> Sink 证据表）
 08. `08-local-to-production-migration.md`（本地到生产迁移手册）
+09. `09-assistant-dialogue-logic.md`（Assistant 对话管理、接口与逻辑图）
+10. `10-api-inventory-and-business-map.md`（接口全量盘点与业务映射）
+11. `11-endpoint-deep-dive.md`（基于本地 8123 OpenAPI 的接口详解）
 
 ## 你会学到什么
 

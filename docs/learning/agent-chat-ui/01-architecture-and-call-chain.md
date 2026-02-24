@@ -29,6 +29,8 @@
    - `onCustomEvent`：把 UIMessage/RemoveUIMessage 归并到 `values.ui`
    - `onThreadId`：同步 query `threadId`，并延迟刷新 thread 列表
 
+初始化里还固定启用 `fetchStateHistory: true`，用于切换 thread 时自动恢复历史状态。
+
 如果 `apiUrl`/`assistantId` 缺失，会先显示设置表单，而不是直接渲染聊天。
 
 ### Step C: 用户提交

@@ -14,6 +14,9 @@ docs/learning/agent-chat-ui/
 ├── 06-component-map.md
 ├── 07-dataflow-matrix.md
 ├── 08-local-to-production-migration.md
+├── 09-assistant-dialogue-logic.md
+├── 10-api-inventory-and-business-map.md
+├── 11-endpoint-deep-dive.md
 └── CLAUDE.md
 ```
 
@@ -29,6 +32,9 @@ docs/learning/agent-chat-ui/
 - `06-component-map.md`: 组件依赖关系、层级职责与复用设计。
 - `07-dataflow-matrix.md`: 关键流程的 Source/Transform/Sink 证据化拆解。
 - `08-local-to-production-migration.md`: 从本地直连迁移到生产鉴权的落地步骤。
+- `09-assistant-dialogue-logic.md`: Assistant 对话主链、接口映射与场景逻辑图。
+- `10-api-inventory-and-business-map.md`: 全量接口盘点、SDK到URL映射与场景-接口关系。
+- `11-endpoint-deep-dive.md`: 基于本地 OpenAPI 的核心接口请求/响应/场景详解。
 - `CLAUDE.md`: 本目录结构与职责边界说明。
 
 ## Boundaries

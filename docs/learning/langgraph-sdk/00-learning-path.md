@@ -28,6 +28,8 @@
 21. `21-execution-checklist-template.md`（执行清单模板）
 22. `22-context-only-policy-and-pitfalls.md`（Context 策略与踩坑）
 23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
+24. `24-langsmith-custom-auth-hands-on.md`（Custom Auth 实操）
+25. `25-supabase-oauth-e2e-playbook.md`（Supabase OAuth 端到端实战）
 
 ## 能力顺序（理解导图）
 
@@ -175,6 +177,8 @@ uv run python sdk_src/examples/langgraph_sdk_learn.py thread-copy --thread-id <T
 - 执行清单模板：`21-execution-checklist-template.md`
 - Context 策略与踩坑：`22-context-only-policy-and-pitfalls.md`
 - Self-hosted Auth 详细学习规划：`23-langsmith-auth-self-hosted-study-plan.md`
+- Custom Auth 实操：`24-langsmith-custom-auth-hands-on.md`
+- Supabase OAuth 端到端实战：`25-supabase-oauth-e2e-playbook.md`
 - Runs：`03-runs-api-playbook.md`
 - 动态配置：`06-runtime-dynamic-config-playbook.md`
 - 本地 MCP：`07-local-mcp-playbook.md`

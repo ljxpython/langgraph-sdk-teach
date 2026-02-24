@@ -16,6 +16,8 @@
 - 通过 `LANGGRAPH_API_URL` 指向后端部署地址
 - 可选注入 `LANGSMITH_API_KEY`
 - 前端只配置 `NEXT_PUBLIC_API_URL=https://your-site/api`
+- 以 `runtime: "edge"` 运行，并透传 `GET/POST/PUT/PATCH/DELETE/OPTIONS`
+- 若 `LANGGRAPH_API_URL` 缺失，会返回可读错误提示而不是低层网络报错
 
 价值：避免把密钥放在浏览器，统一服务端鉴权策略。
 
