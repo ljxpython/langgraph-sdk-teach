@@ -24,6 +24,10 @@
       "excludes": ["authorization", "x-api-key"]
     }
   },
+  "auth": {
+    "path": "./graph_src/auth_oauth.py:oauth_auth",
+    "disable_studio_auth": false
+  },
   "env": ".env",
   "image_distro": "wolfi"
 }

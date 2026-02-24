@@ -49,3 +49,13 @@ async def resolve_assistant_uuid(client: Any, value: str) -> str:
     raise ValueError(
         f"无法解析 assistant 标识: {value}. 请传 assistant UUID，或可匹配到的 graph_id/name。"
     )
+
+
+def build_client_headers(api_key: str | None, bearer_token: str | None) -> dict[str, str]:
+    if api_key and bearer_token:
+        raise ValueError("--api-key 和 --bearer-token 不能同时传入")
+    if bearer_token:
+        return {"Authorization": f"Bearer {bearer_token}"}
+    if api_key:
+        return {"x-api-key": api_key}
+    return {}

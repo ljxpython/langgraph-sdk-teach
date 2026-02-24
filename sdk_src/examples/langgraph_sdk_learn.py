@@ -7,7 +7,7 @@ from typing import Any, Awaitable, Callable
 from langgraph_sdk import get_client
 
 from langgraph_sdk_learn_assistants import register as register_assistants
-from langgraph_sdk_learn_common import DEFAULT_ASSISTANT_ID, DEFAULT_URL
+from langgraph_sdk_learn_common import DEFAULT_ASSISTANT_ID, DEFAULT_URL, build_client_headers
 from langgraph_sdk_learn_runs import register as register_runs
 from langgraph_sdk_learn_threads import register as register_threads
 
@@ -21,6 +21,8 @@ def build_parser() -> tuple[argparse.ArgumentParser, dict[str, Handler]]:
     def add_runtime_args(subparser: argparse.ArgumentParser) -> None:
         subparser.add_argument("--url", default=DEFAULT_URL, help="LangGraph API URL")
         subparser.add_argument("--assistant-id", default=DEFAULT_ASSISTANT_ID, help="assistant_id 或 graph_id")
+        subparser.add_argument("--api-key", default=None, help="自定义认证使用的 x-api-key")
+        subparser.add_argument("--bearer-token", default=None, help="自定义认证使用的 Bearer token")
 
     handlers: dict[str, Handler] = {}
     handlers.update(register_assistants(subparsers, add_runtime_args))
@@ -32,7 +34,8 @@ def build_parser() -> tuple[argparse.ArgumentParser, dict[str, Handler]]:
 async def async_main() -> None:
     parser, handlers = build_parser()
     args = parser.parse_args()
-    client = get_client(url=args.url)
+    headers = build_client_headers(getattr(args, "api_key", None), getattr(args, "bearer_token", None))
+    client = get_client(url=args.url, headers=headers or None)
 
     handler = handlers.get(args.command)
     if handler is None:
