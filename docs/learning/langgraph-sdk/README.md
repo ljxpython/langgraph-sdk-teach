@@ -41,6 +41,8 @@
 23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
 24. `24-langsmith-custom-auth-hands-on.md`（Custom Auth 实操手册）
 25. `25-supabase-oauth-e2e-playbook.md`（Supabase OAuth 端到端实战）
+26. `26-context-config-runtime-flow.md`（context/config/runtime 参数流转）
+27. `27-v1-v2-framework-architecture-guide.md`（v1/v2 架构路线与设计方法）
 
 ## 当前进度
 
@@ -79,6 +81,8 @@
 - `23-langsmith-auth-self-hosted-study-plan.md`
 - `24-langsmith-custom-auth-hands-on.md`
 - `25-supabase-oauth-e2e-playbook.md`
+- `26-context-config-runtime-flow.md`
+- `27-v1-v2-framework-architecture-guide.md`
 - `04-threads-api-playbook.md`
 - `03-runs-api-playbook.md`
 - `06-runtime-dynamic-config-playbook.md`

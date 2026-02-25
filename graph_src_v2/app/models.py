@@ -1,0 +1,61 @@
+from __future__ import annotations
+
+from typing import Any
+
+from langchain.chat_models import init_chat_model
+from langchain_core.language_models.chat_models import BaseChatModel
+
+from graph_src_v2.config import AppRuntimeConfig, ModelSpec
+
+
+def _init_chat_model(
+    *,
+    model_provider: str,
+    model: str,
+    api_key: str,
+    base_url: str | None = None,
+) -> BaseChatModel:
+    """统一封装 init_chat_model，避免散落的 provider/base_url/api_key 组装逻辑。"""
+
+    kwargs: dict[str, Any] = {
+        "api_key": api_key,
+    }
+    if base_url:
+        kwargs["base_url"] = base_url
+
+    return init_chat_model(model=model, model_provider=model_provider, **kwargs)
+
+
+def resolve_model(model_spec: ModelSpec) -> BaseChatModel:
+    provider = model_spec.model_provider.strip()
+    model = model_spec.model.strip()
+    key = model_spec.api_key.strip()
+    if not provider:
+        raise ValueError("Missing model_provider.")
+    if not model:
+        raise ValueError("Missing model_name.")
+    if not key:
+        raise ValueError("Missing model_api_key.")
+
+    normalized_base_url = model_spec.base_url.strip() if isinstance(model_spec.base_url, str) else None
+    normalized_base_url = normalized_base_url or None
+
+    return _init_chat_model(
+        model_provider=provider,
+        model=model,
+        api_key=key,
+        base_url=normalized_base_url,
+    )
+
+
+def apply_model_runtime_params(model: Any, options: AppRuntimeConfig) -> Any:
+    kwargs: dict[str, Any] = {}
+    if options.temperature is not None:
+        kwargs["temperature"] = options.temperature
+    if options.max_tokens is not None:
+        kwargs["max_tokens"] = options.max_tokens
+    if options.top_p is not None:
+        kwargs["top_p"] = options.top_p
+    if not kwargs:
+        return model
+    return model.bind(**kwargs)

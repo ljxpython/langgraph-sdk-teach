@@ -13,6 +13,16 @@ rate_limiter = InMemoryRateLimiter(
     check_every_n_seconds=1, # 每60分钟检查一次是否超过速率限制
 )
 
+
+def init_deepseek_model():
+    return init_chat_model(
+        model_provider='openai',
+        model='deepseek-chat',
+        base_url='https://api.deepseek.com/v1',
+        api_key=os.getenv('DEEPSEEK_API_KEY')
+    )
+
+
 def get_deepseak_model():
     return ChatOpenAI(
         model='deepseek-chat',
@@ -88,10 +98,12 @@ def get_chat_model():
     )
 
 if __name__ == '__main__':
-    # model = get_deepseak_model()
+    model = get_deepseak_model()
     # model = get_kimi_model()
     # model = get_mass_glm_model()
-    model = get_mass_glm_4_model()
+    # model = get_mass_glm_4_model()
+    # model = get_doubao_model()
+    # model = init_deepseek_model()
     # model = get_chat_model()
     response = model.invoke('你是谁')
     print(response)

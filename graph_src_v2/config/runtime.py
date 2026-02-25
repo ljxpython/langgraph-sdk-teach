@@ -1,0 +1,330 @@
+from __future__ import annotations
+
+import dataclasses
+import os
+from dataclasses import dataclass, field
+from typing import Any, Mapping
+
+from graph_src_v2.conf.settings import require_model_spec
+
+DEFAULT_SYSTEM_PROMPT = (
+    "You are an expert researcher. Your job is to conduct thorough research and then "
+    "write a polished report."
+)
+
+
+@dataclass
+class ModelSpec:
+    model_provider: str
+    model: str
+    base_url: str
+    api_key: str
+
+
+@dataclass
+class AppRuntimeConfig:
+    environment: str = "test"
+    model_id: str | None = None
+    model_spec: ModelSpec = field(default_factory=lambda: ModelSpec(model_provider="", model="", base_url="", api_key=""))
+    system_prompt: str = DEFAULT_SYSTEM_PROMPT
+    enable_local_tools: bool = True
+    enable_local_mcp: bool = False
+    mcp_servers: list[str] | None = None
+    temperature: float | None = None
+    max_tokens: int | None = None
+    top_p: float | None = None
+    middlewares: list[str] | None = None
+    persistence_profile: str | None = None
+    memory_backend: str = "memory"
+    store_backend: str = "memory"
+    postgres_dsn: str | None = None
+    redis_url: str | None = None
+
+
+def _parse_bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def _parse_float(value: Any, default: float | None = None) -> float | None:
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _parse_int(value: Any, default: int | None = None) -> int | None:
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def read_configurable(config: Mapping[str, Any] | None) -> Mapping[str, Any]:
+    if not isinstance(config, Mapping):
+        return {}
+    configurable = config.get("configurable")
+    return configurable if isinstance(configurable, Mapping) else {}
+
+
+def context_to_mapping(raw: Any) -> Mapping[str, Any]:
+    if raw is None:
+        return {}
+    if isinstance(raw, Mapping):
+        return raw
+    if dataclasses.is_dataclass(raw) and not isinstance(raw, type):
+        return dataclasses.asdict(raw)
+    if hasattr(raw, "__dict__") and isinstance(raw.__dict__, dict):
+        return raw.__dict__
+    return {}
+
+
+def merge_trusted_auth_context(
+    config: Mapping[str, Any] | None,
+    runtime_context: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    merged = dict(runtime_context or {})
+    configurable = read_configurable(config)
+
+    auth_user_id = configurable.get("langgraph_auth_user_id")
+    if auth_user_id is not None:
+        merged["user_id"] = str(auth_user_id)
+
+    auth_user = configurable.get("langgraph_auth_user")
+    auth_role = None
+    auth_org_id = None
+    auth_permissions = None
+    if isinstance(auth_user, Mapping):
+        auth_role = auth_user.get("role")
+        auth_org_id = auth_user.get("org_id")
+        auth_permissions = auth_user.get("permissions")
+    elif auth_user is not None:
+        auth_role = getattr(auth_user, "role", None)
+        auth_org_id = getattr(auth_user, "org_id", None)
+        auth_permissions = getattr(auth_user, "permissions", None)
+
+    if auth_org_id is not None:
+        merged["tenant_id"] = str(auth_org_id)
+    if auth_role is not None:
+        merged["role"] = str(auth_role)
+    if isinstance(auth_permissions, (list, tuple, set)):
+        merged["permissions"] = [str(item) for item in auth_permissions]
+
+    return merged
+
+
+def _split_csv(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _parse_mcp_servers(raw: Any) -> list[str]:
+    if raw is None:
+        return []
+    if isinstance(raw, (list, tuple, set)):
+        values = [str(item).strip() for item in raw if str(item).strip()]
+    elif isinstance(raw, str):
+        values = _split_csv(raw)
+    else:
+        values = [str(raw).strip()]
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for item in values:
+        key = item.lower()
+        if key in {"", "none"} or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(key)
+    return normalized
+
+
+def _parse_middleware_names(raw: Any) -> list[str] | None:
+    # None 表示“未配置 middlewares”，由中间件层选择默认值。
+    # 显式传 "none" / [] / 空字符串等，解析结果会是 []，表示“禁用中间件”。
+    if raw is None:
+        return None
+    if isinstance(raw, (list, tuple, set)):
+        values = [str(item).strip() for item in raw if str(item).strip()]
+    elif isinstance(raw, str):
+        values = _split_csv(raw)
+    else:
+        values = [str(raw).strip()]
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for item in values:
+        key = item.lower()
+        if key in {"", "none"} or key in seen:
+            continue
+        seen.add(key)
+        normalized.append(key)
+    return normalized
+
+
+def build_runtime_config(
+    config: Mapping[str, Any] | None,
+    runtime_context: Mapping[str, Any] | None = None,
+) -> AppRuntimeConfig:
+    configurable = read_configurable(config)
+    context_data = runtime_context or {}
+
+    environment = str(
+        context_data.get("environment")
+        or configurable.get("environment")
+        or os.getenv("APP_ENV")
+        or os.getenv("DYNACONF_ENV")
+        or "test"
+    ).lower()
+
+    default_memory_backend = "postgres" if environment in {"prod", "production"} else "memory"
+    default_store_backend = "redis" if environment in {"prod", "production"} else "memory"
+
+    memory_backend = str(
+        context_data.get("memory_backend")
+        or configurable.get("memory_backend")
+        or os.getenv("MEMORY_BACKEND")
+        or default_memory_backend
+    ).lower()
+    store_backend = str(
+        context_data.get("store_backend")
+        or configurable.get("store_backend")
+        or os.getenv("STORE_BACKEND")
+        or default_store_backend
+    ).lower()
+    persistence_profile_raw = (
+        context_data.get("persistence_profile")
+        or configurable.get("persistence_profile")
+        or configurable.get("x-persistence-profile")
+        or os.getenv("PERSISTENCE_PROFILE")
+    )
+    persistence_profile = (
+        str(persistence_profile_raw).strip().lower() if persistence_profile_raw is not None else None
+    ) or None
+
+    # ===== 模型选择策略 =====
+    model_id_raw = (
+        context_data.get("model_id")
+        or configurable.get("model_id")
+        or os.getenv("MODEL_ID")
+    )
+    resolved_model_id, model_spec = require_model_spec(
+        str(model_id_raw).strip() if model_id_raw is not None else None
+    )
+
+    resolved_model_spec = ModelSpec(
+        model_provider=model_spec["model_provider"],
+        model=model_spec["model"],
+        base_url=model_spec["base_url"],
+        api_key=model_spec["api_key"],
+    )
+
+    system_prompt = str(
+        context_data.get("system_prompt")
+        or context_data.get("system_message")
+        or configurable.get("system_prompt")
+        or configurable.get("x-system-prompt")
+        or os.getenv("SYSTEM_PROMPT")
+        or DEFAULT_SYSTEM_PROMPT
+    )
+    enable_local_tools = _parse_bool(
+        context_data.get("enable_local_tools")
+        if "enable_local_tools" in context_data
+        else (
+            configurable.get("enable_local_tools")
+            if "enable_local_tools" in configurable
+            else configurable.get("x-enable-local-tools")
+        ),
+        default=True,
+    )
+    enable_local_mcp = _parse_bool(
+        context_data.get("enable_local_mcp")
+        if "enable_local_mcp" in context_data
+        else (
+            configurable.get("enable_local_mcp")
+            if "enable_local_mcp" in configurable
+            else configurable.get("x-enable-local-mcp")
+        ),
+        default=False,
+    )
+
+    raw_servers = context_data.get("mcp_servers")
+    if raw_servers is None:
+        raw_servers = (
+            configurable.get("mcp_servers")
+            if "mcp_servers" in configurable
+            else configurable.get("x-mcp-servers")
+        )
+    mcp_servers = _parse_mcp_servers(raw_servers)
+    if not enable_local_mcp:
+        mcp_servers = []
+    if enable_local_mcp and not mcp_servers:
+        mcp_servers = ["local_math"]
+
+    raw_middlewares = context_data.get("middlewares")
+    if raw_middlewares is None:
+        raw_middlewares = (
+            configurable.get("middlewares")
+            if "middlewares" in configurable
+            else configurable.get("x-middlewares")
+        )
+    if raw_middlewares is None:
+        raw_middlewares = os.getenv("MIDDLEWARES")
+    middlewares = _parse_middleware_names(raw_middlewares)
+
+    temperature = _parse_float(
+        context_data.get("temperature")
+        if "temperature" in context_data
+        else configurable.get("temperature"),
+        default=None,
+    )
+    top_p = _parse_float(
+        context_data.get("top_p") if "top_p" in context_data else configurable.get("top_p"),
+        default=None,
+    )
+    max_tokens = _parse_int(
+        context_data.get("max_tokens")
+        if "max_tokens" in context_data
+        else configurable.get("max_tokens"),
+        default=None,
+    )
+
+    postgres_dsn = str(
+        context_data.get("postgres_dsn")
+        or configurable.get("postgres_dsn")
+        or os.getenv("POSTGRES_DSN")
+        or ""
+    ).strip() or None
+    redis_url = str(
+        context_data.get("redis_url")
+        or configurable.get("redis_url")
+        or os.getenv("REDIS_URL")
+        or ""
+    ).strip() or None
+
+    return AppRuntimeConfig(
+        environment=environment,
+        model_id=resolved_model_id,
+        model_spec=resolved_model_spec,
+        system_prompt=system_prompt,
+        enable_local_tools=enable_local_tools,
+        enable_local_mcp=enable_local_mcp,
+        mcp_servers=mcp_servers,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        top_p=top_p,
+        middlewares=middlewares,
+        persistence_profile=persistence_profile,
+        memory_backend=memory_backend,
+        store_backend=store_backend,
+        postgres_dsn=postgres_dsn,
+        redis_url=redis_url,
+    )

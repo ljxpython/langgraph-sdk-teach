@@ -30,6 +30,8 @@
 23. `23-langsmith-auth-self-hosted-study-plan.md`（Self-hosted Auth 详细学习规划）
 24. `24-langsmith-custom-auth-hands-on.md`（Custom Auth 实操）
 25. `25-supabase-oauth-e2e-playbook.md`（Supabase OAuth 端到端实战）
+26. `26-context-config-runtime-flow.md`（context/config/runtime 参数流转）
+27. `27-v1-v2-framework-architecture-guide.md`（v1/v2 架构路线与设计方法）
 
 ## 能力顺序（理解导图）
 
@@ -179,6 +181,8 @@ uv run python sdk_src/examples/langgraph_sdk_learn.py thread-copy --thread-id <T
 - Self-hosted Auth 详细学习规划：`23-langsmith-auth-self-hosted-study-plan.md`
 - Custom Auth 实操：`24-langsmith-custom-auth-hands-on.md`
 - Supabase OAuth 端到端实战：`25-supabase-oauth-e2e-playbook.md`
+- 参数流转说明：`26-context-config-runtime-flow.md`
+- v1/v2 架构路线：`27-v1-v2-framework-architecture-guide.md`
 - Runs：`03-runs-api-playbook.md`
 - 动态配置：`06-runtime-dynamic-config-playbook.md`
 - 本地 MCP：`07-local-mcp-playbook.md`

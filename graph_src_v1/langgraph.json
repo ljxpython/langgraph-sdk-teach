@@ -1,0 +1,12 @@
+{
+  "python_version": "3.13",
+  "dockerfile_lines": [],
+  "dependencies": [
+    "./"
+  ],
+  "graphs": {
+    "assistant": "./graph_src_v1/agents/assistant_agent/graph.py:agent",
+    "deepagent_demo": "./graph_src_v1/agents/deepagent_agent/graph.py:deepagent_demo"
+  },
+  "env": ".env"
+}

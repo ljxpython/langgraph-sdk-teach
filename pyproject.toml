@@ -19,4 +19,6 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "langgraph-checkpoint-postgres>=3.0.4",
     "psycopg[binary]>=3.3.3",
+    "pytest>=9.0.2",
+    "dynaconf>=3.2.12",
 ]

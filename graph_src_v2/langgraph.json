@@ -1,0 +1,27 @@
+{
+  "python_version": "3.13",
+  "dockerfile_lines": [],
+  "dependencies": [
+    "./"
+  ],
+  "graphs": {
+    "assistant": "./graph_src_v2/agents/assistant_agent/graph.py:graph",
+    "deepagent_demo": "./graph_src_v2/agents/deepagent_agent/graph.py:graph"
+  },
+  "http": {
+    "cors": {
+      "allow_origins": [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://localhost",
+        "http://127.0.0.1"
+      ],
+      "allow_methods": ["*"],
+      "allow_headers": ["*"],
+      "allow_credentials": false
+    }
+  },
+  "env": "./graph_src_v2/.env"
+}
