@@ -9,6 +9,9 @@
     },
     "deepagent_demo": {
       "path": "./graph_src/deepagent_example.py:deepagent_demo"
+    },
+    "test_agent": {
+      "path": "./graph_src/agent.py:demo_agent"
     }
   },
   "http": {

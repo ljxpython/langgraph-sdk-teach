@@ -341,3 +341,14 @@ agent_not_deep = create_agent(
 async def agent(config: RunnableConfig, runtime: ServerRuntime):
     async with make_graph(config, runtime) as runtime_agent:
         yield runtime_agent
+
+
+
+def test_agent():
+    return create_agent(
+        model=get_mass_glm_4_model(),
+        tools=get_local_tools(),
+        system_prompt=DEFAULT_SYSTEM_PROMPT,
+    )
+
+demo_agent = test_agent()
