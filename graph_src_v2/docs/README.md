@@ -4,7 +4,7 @@
 
 ## 1) 先理解这套最小心智模型
 
-- 图入口：`assistant` 与 `deepagent_demo`
+- 图入口：`assistant`、`deepagent_demo`、`deepagents_data_analysis_demo`、`personal_assistant_demo`、`customer_support_handoffs_demo`、`router_knowledge_base_demo`、`skills_sql_assistant_demo`
 - 运行时配置：`runtime/options.py`（模型、工具、MCP 开关与参数）
 - 模型装配：`runtime/modeling.py`
 - 工具装配：`tools/registry.py`
@@ -22,9 +22,39 @@ uv run langgraph dev --config graph_src_v2/langgraph.json --port 8123 --no-brows
 
 默认行为：
 
-- 使用 `auth/provider.py:custom_auth`
+- `langgraph.json` 本地模式不启用 auth
 - 默认不启用本地 tools（`enable_local_tools=false`）
 - 默认不启用 MCP（`enable_local_mcp=false`）
+
+### 2.1 personal_assistant_demo 是什么
+
+- 迁移自 LangChain 官方 `subagents-personal-assistant` 示例
+- 三层结构：低层日历/邮件工具 → calendar/email 子 agent → supervisor agent
+- 设计原则：最小可运行、薄封装、无额外注册层
+
+### 2.2 customer_support_handoffs_demo 是什么
+
+- 迁移自 LangChain 官方 `handoffs-customer-support` 示例
+- 核心机制：单 agent + 状态机 step 切换（`warranty_collector` → `issue_classifier` → `resolution_specialist`）
+- 通过 tool 返回 `Command(update=...)` 更新工作流状态，不做过度封装
+
+### 2.3 router_knowledge_base_demo 是什么
+
+- 迁移自 LangChain 官方 `router-knowledge-base` 示例
+- 核心机制：分类路由 -> 并行查询 github/notion/slack 专家 -> 最终综合回答
+- 使用 `StateGraph + Send` 显式并行路由，保持最小实现与可读性
+
+### 2.4 skills_sql_assistant_demo 是什么
+
+- 迁移自 LangChain 官方 `skills-sql-assistant` 示例
+- 核心机制：通过 middleware 暴露 skills 摘要，按需用 `load_skill` 加载详细 schema/业务规则
+- 目标：减少上下文冗余（progressive disclosure），保持单 agent 对话体验
+
+### 2.5 deepagents_data_analysis_demo 是什么
+
+- 迁移自 LangChain 官方 `deepagents/data-analysis` 示例
+- 核心能力：读取本地数据文件、执行分析脚本、生成可视化产物并在最终回复中回报产物路径
+- 按你的要求移除了 Slack 交付流程，仅保留本地产物工作流
 
 ## 3) 最快可用验证路径
 
