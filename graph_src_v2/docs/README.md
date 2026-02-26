@@ -8,8 +8,7 @@
 - `graph_src_v2/agents/assistant_agent/graph.py`：assistant 编译图（内部组合 `create_agent`）。
 - `graph_src_v2/agents/deepagent_agent/graph.py`：deepagent 编译图（内部组合 `create_deep_agent`）。
 - `graph_src_v2/runtime/context.py`：统一运行时上下文契约（含身份字段）。
-- `graph_src_v2/auth.py`：本地教学 token 认证/授权。
-- `graph_src_v2/auth_oauth.py`：Supabase OAuth 认证/授权。
+- `graph_src_v2/auth.py`：内置 demo token 与 Supabase OAuth 两种认证入口。
 
 ## 2. 启动（本地）
 
@@ -22,7 +21,7 @@ uv run langgraph dev --config graph_src_v2/langgraph.json --port 8123 --no-brows
 说明：
 
 - 当前 `langgraph.json` 默认使用 `graph_src_v2/auth.py:custom_auth`。
-- 如需 OAuth，改 `auth.path` 为 `./graph_src_v2/auth_oauth.py:oauth_auth`。
+- 如需 OAuth，改 `auth.path` 为 `./graph_src_v2/auth.py:oauth_auth`。
 
 ## 3. SDK 快速验证
 

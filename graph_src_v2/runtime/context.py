@@ -22,11 +22,11 @@ class RuntimeContext:
     max_tokens: int | None = None
     top_p: float | None = None
     enable_local_tools: bool | None = None
+    local_tools: list[str] | None = None
     enable_local_mcp: bool | None = None
     mcp_servers: list[str] | None = None
     skills: list[str] | None = None
     subagents: list[dict[str, object]] | None = None
-    middlewares: list[str] | None = None
 
     def to_mapping(self) -> dict[str, Any]:
         # Drop None values so downstream resolver can use fallback logic clearly.

@@ -9,6 +9,7 @@
     "deepagent_demo": "./graph_src_v2/agents/deepagent_agent/graph.py:graph"
   },
   "http": {
+    "app": "./graph_src_v2/custom_routes/app.py:app",
     "cors": {
       "allow_origins": [
         "http://localhost:3000",

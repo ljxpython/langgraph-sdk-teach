@@ -9,13 +9,14 @@ from langgraph.config import get_config
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.runtime import Runtime
 
-from graph_src_v2.app.models import apply_model_runtime_params, resolve_model
-from graph_src_v2.config.runtime import (
+from graph_src_v2.runtime.modeling import apply_model_runtime_params, resolve_model
+from graph_src_v2.runtime.options import (
     build_runtime_config,
     context_to_mapping,
     merge_trusted_auth_context,
 )
-from graph_src_v2.middlewares.registry import build_middleware
+from graph_src_v2.middlewares.message_sanitizer import MessageSanitizerMiddleware
+from graph_src_v2.middlewares.tool_error_guard import ToolErrorGuardMiddleware
 from graph_src_v2.runtime.context import RuntimeContext
 from graph_src_v2.tools.registry import build_tools
 
@@ -77,7 +78,7 @@ def _format_model_credential_error(options: Any, exc: BaseException) -> str:
         + "\n\n解决方式：\n"
         + "1) 在 `graph_src_v2/.env` 中配置 `MODEL_ID` 对应模型组所需的 key（见 `conf/settings.yaml`）。\n"
         + "2) 如果你在用 OpenAI-compatible 中转（`OPENAI_BASE_URL`），请确认该中转服务的 key 未被禁用。\n"
-        + "3) 需要切模型时仅传 `model_id`，其余连接参数由 Dynaconf 映射。\n\n"
+        + "3) 需要切模型时仅传 `model_id`，其余连接参数由 settings.yaml 模型组映射。\n\n"
         + f"原始错误：{exc}"
     )
 
@@ -120,7 +121,7 @@ async def _run_assistant(
     options = build_runtime_config(config, runtime_context)
 
     tools = await build_tools(options)
-    middleware = cast(list[Any], build_middleware(options))
+    middleware = cast(list[Any], [MessageSanitizerMiddleware(), ToolErrorGuardMiddleware()])
     model = apply_model_runtime_params(
         resolve_model(options.model_spec),
         options,
@@ -158,3 +159,19 @@ _builder.add_edge(START, "run_assistant")
 _builder.add_edge("run_assistant", END)
 
 graph = _builder.compile(name="assistant")
+
+
+
+if __name__ == '__main__':
+    import asyncio
+
+    from langchain_core.messages import HumanMessage
+
+    async def _main() -> None:
+        resp = await graph.ainvoke(
+            {"messages": [HumanMessage(content="你好")]},
+            config={"recursion_limit": 10},
+        )
+        print(resp)
+
+    asyncio.run(_main())

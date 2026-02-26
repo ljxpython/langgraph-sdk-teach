@@ -27,18 +27,13 @@ class AppRuntimeConfig:
     model_id: str | None = None
     model_spec: ModelSpec = field(default_factory=lambda: ModelSpec(model_provider="", model="", base_url="", api_key=""))
     system_prompt: str = DEFAULT_SYSTEM_PROMPT
-    enable_local_tools: bool = True
+    enable_local_tools: bool = False
+    local_tools: list[str] | None = None
     enable_local_mcp: bool = False
     mcp_servers: list[str] | None = None
     temperature: float | None = None
     max_tokens: int | None = None
     top_p: float | None = None
-    middlewares: list[str] | None = None
-    persistence_profile: str | None = None
-    memory_backend: str = "memory"
-    store_backend: str = "memory"
-    postgres_dsn: str | None = None
-    redis_url: str | None = None
 
 
 def _parse_bool(value: Any, default: bool = False) -> bool:
@@ -147,9 +142,7 @@ def _parse_mcp_servers(raw: Any) -> list[str]:
     return normalized
 
 
-def _parse_middleware_names(raw: Any) -> list[str] | None:
-    # None 表示“未配置 middlewares”，由中间件层选择默认值。
-    # 显式传 "none" / [] / 空字符串等，解析结果会是 []，表示“禁用中间件”。
+def _parse_tool_names(raw: Any) -> list[str] | None:
     if raw is None:
         return None
     if isinstance(raw, (list, tuple, set)):
@@ -185,32 +178,6 @@ def build_runtime_config(
         or "test"
     ).lower()
 
-    default_memory_backend = "postgres" if environment in {"prod", "production"} else "memory"
-    default_store_backend = "redis" if environment in {"prod", "production"} else "memory"
-
-    memory_backend = str(
-        context_data.get("memory_backend")
-        or configurable.get("memory_backend")
-        or os.getenv("MEMORY_BACKEND")
-        or default_memory_backend
-    ).lower()
-    store_backend = str(
-        context_data.get("store_backend")
-        or configurable.get("store_backend")
-        or os.getenv("STORE_BACKEND")
-        or default_store_backend
-    ).lower()
-    persistence_profile_raw = (
-        context_data.get("persistence_profile")
-        or configurable.get("persistence_profile")
-        or configurable.get("x-persistence-profile")
-        or os.getenv("PERSISTENCE_PROFILE")
-    )
-    persistence_profile = (
-        str(persistence_profile_raw).strip().lower() if persistence_profile_raw is not None else None
-    ) or None
-
-    # ===== 模型选择策略 =====
     model_id_raw = (
         context_data.get("model_id")
         or configurable.get("model_id")
@@ -243,15 +210,31 @@ def build_runtime_config(
             if "enable_local_tools" in configurable
             else configurable.get("x-enable-local-tools")
         ),
-        default=True,
+        default=False,
     )
+    raw_local_tools = context_data.get("local_tools")
+    if raw_local_tools is None:
+        raw_local_tools = (
+            configurable.get("local_tools")
+            if "local_tools" in configurable
+            else (
+                configurable.get("x-local-tools")
+                if "x-local-tools" in configurable
+                else os.getenv("LOCAL_TOOLS")
+            )
+        )
+    local_tools = _parse_tool_names(raw_local_tools)
     enable_local_mcp = _parse_bool(
         context_data.get("enable_local_mcp")
         if "enable_local_mcp" in context_data
         else (
             configurable.get("enable_local_mcp")
             if "enable_local_mcp" in configurable
-            else configurable.get("x-enable-local-mcp")
+            else (
+                configurable.get("x-enable-local-mcp")
+                if "x-enable-local-mcp" in configurable
+                else os.getenv("ENABLE_LOCAL_MCP")
+            )
         ),
         default=False,
     )
@@ -261,24 +244,17 @@ def build_runtime_config(
         raw_servers = (
             configurable.get("mcp_servers")
             if "mcp_servers" in configurable
-            else configurable.get("x-mcp-servers")
+            else (
+                configurable.get("x-mcp-servers")
+                if "x-mcp-servers" in configurable
+                else configurable.get("x-mcp-server")
+            )
         )
+    if raw_servers is None:
+        raw_servers = os.getenv("MCP_SERVERS")
     mcp_servers = _parse_mcp_servers(raw_servers)
     if not enable_local_mcp:
         mcp_servers = []
-    if enable_local_mcp and not mcp_servers:
-        mcp_servers = ["local_math"]
-
-    raw_middlewares = context_data.get("middlewares")
-    if raw_middlewares is None:
-        raw_middlewares = (
-            configurable.get("middlewares")
-            if "middlewares" in configurable
-            else configurable.get("x-middlewares")
-        )
-    if raw_middlewares is None:
-        raw_middlewares = os.getenv("MIDDLEWARES")
-    middlewares = _parse_middleware_names(raw_middlewares)
 
     temperature = _parse_float(
         context_data.get("temperature")
@@ -297,34 +273,16 @@ def build_runtime_config(
         default=None,
     )
 
-    postgres_dsn = str(
-        context_data.get("postgres_dsn")
-        or configurable.get("postgres_dsn")
-        or os.getenv("POSTGRES_DSN")
-        or ""
-    ).strip() or None
-    redis_url = str(
-        context_data.get("redis_url")
-        or configurable.get("redis_url")
-        or os.getenv("REDIS_URL")
-        or ""
-    ).strip() or None
-
     return AppRuntimeConfig(
         environment=environment,
         model_id=resolved_model_id,
         model_spec=resolved_model_spec,
         system_prompt=system_prompt,
         enable_local_tools=enable_local_tools,
+        local_tools=local_tools,
         enable_local_mcp=enable_local_mcp,
         mcp_servers=mcp_servers,
         temperature=temperature,
         max_tokens=max_tokens,
         top_p=top_p,
-        middlewares=middlewares,
-        persistence_profile=persistence_profile,
-        memory_backend=memory_backend,
-        store_backend=store_backend,
-        postgres_dsn=postgres_dsn,
-        redis_url=redis_url,
     )

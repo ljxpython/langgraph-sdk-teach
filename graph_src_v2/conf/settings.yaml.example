@@ -1,4 +1,4 @@
-# Dynaconf settings template
+# YAML settings template
 
 default:
   default_model_id: glm4_mass

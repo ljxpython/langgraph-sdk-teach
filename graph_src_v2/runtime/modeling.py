@@ -5,7 +5,7 @@ from typing import Any
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from graph_src_v2.config import AppRuntimeConfig, ModelSpec
+from graph_src_v2.runtime.options import AppRuntimeConfig, ModelSpec
 
 
 def _init_chat_model(
@@ -15,8 +15,6 @@ def _init_chat_model(
     api_key: str,
     base_url: str | None = None,
 ) -> BaseChatModel:
-    """统一封装 init_chat_model，避免散落的 provider/base_url/api_key 组装逻辑。"""
-
     kwargs: dict[str, Any] = {
         "api_key": api_key,
     }

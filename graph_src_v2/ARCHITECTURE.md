@@ -17,8 +17,8 @@
 - `graph_src_v2/runtime/context.py`: shared `RuntimeContext` schema.
 - `graph_src_v2/agents/assistant_agent/graph.py`: compiled assistant graph.
 - `graph_src_v2/agents/deepagent_agent/graph.py`: compiled deepagent graph.
-- `graph_src_v2/config/runtime.py`: context/config to runtime options resolver.
-- `graph_src_v2/app/models.py`: model provider resolution + runtime params binding.
+- `graph_src_v2/runtime/options.py`: context/config to runtime options resolver.
+- `graph_src_v2/runtime/modeling.py`: model provider resolution + runtime params binding.
 - `graph_src_v2/tools/registry.py`: local tools + MCP tool assembly.
 
 ## Runtime Strategy

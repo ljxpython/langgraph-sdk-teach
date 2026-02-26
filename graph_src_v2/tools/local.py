@@ -21,5 +21,27 @@ def to_upper(text: str) -> str:
     return text.upper()
 
 
-def get_local_tools() -> list[Any]:
-    return [word_count, utc_now, to_upper]
+_LOCAL_TOOL_REGISTRY: dict[str, Any] = {
+    "word_count": word_count,
+    "utc_now": utc_now,
+    "to_upper": to_upper,
+}
+
+
+def get_local_tools(tool_names: list[str] | None = None) -> list[Any]:
+    if tool_names is None:
+        return list(_LOCAL_TOOL_REGISTRY.values())
+
+    selected: list[Any] = []
+    seen: set[str] = set()
+    for raw_name in tool_names:
+        key = str(raw_name).strip().lower()
+        if not key or key in seen:
+            continue
+        tool_obj = _LOCAL_TOOL_REGISTRY.get(key)
+        if tool_obj is None:
+            allowed = ", ".join(sorted(_LOCAL_TOOL_REGISTRY.keys()))
+            raise ValueError(f"Unsupported local tool '{raw_name}', allowed: {allowed}")
+        seen.add(key)
+        selected.append(tool_obj)
+    return selected

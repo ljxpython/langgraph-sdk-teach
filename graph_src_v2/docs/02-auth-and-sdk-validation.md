@@ -12,7 +12,7 @@
 
 ### 1.2 OAuth 模式（Supabase）
 
-- 将 `langgraph.json` 的 `auth.path` 改为 `./graph_src_v2/auth_oauth.py:oauth_auth`
+- 将 `langgraph.json` 的 `auth.path` 改为 `./graph_src_v2/auth.py:oauth_auth`
 - `.env` 需配置：`SUPABASE_URL`、`SUPABASE_SERVICE_KEY`
 
 ## 2. 推荐验证顺序（SDK）
