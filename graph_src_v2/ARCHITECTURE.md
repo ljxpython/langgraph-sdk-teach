@@ -30,10 +30,11 @@
 ## Multi-Graph Rule
 
 - `assistant` and `deepagent_demo` follow the same contract.
-- Dynamic model routing, MCP/tool switches, and deepagent skills/subagents are runtime-driven per run.
+- Dynamic model routing and MCP/tool switches are runtime-driven per run.
+- `deepagent_demo` keeps static `skills/subagents` lists for simpler maintenance.
 
 ## Runbook
 
 ```bash
-APP_ENV=dev langgraph dev --config graph_src_v2/langgraph.json
+APP_ENV=test langgraph dev --config graph_src_v2/langgraph.json
 ```

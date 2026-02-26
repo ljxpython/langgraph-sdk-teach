@@ -4,6 +4,9 @@
   "dependencies": [
     "./"
   ],
+  "auth": {
+    "path": "./graph_src_v2/auth/provider.py:oauth_auth"
+  },
   "graphs": {
     "assistant": "./graph_src_v2/agents/assistant_agent/graph.py:graph",
     "deepagent_demo": "./graph_src_v2/agents/deepagent_agent/graph.py:graph"

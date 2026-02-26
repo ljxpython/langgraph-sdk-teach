@@ -1,65 +1,92 @@
-# graph_src_v2 使用说明（执行层）
+# graph_src_v2 新手开发与使用指南
 
-`graph_src_v2` 只负责 LangGraph 执行，不承载平台业务 API。
+`graph_src_v2` 是纯执行层：负责 LangGraph 图运行、运行时参数解析、工具/MCP 装配与鉴权。
 
-## 1. 目录定位
+## 1) 先理解这套最小心智模型
 
-- `graph_src_v2/langgraph.json`：v2 图注册与 auth 配置入口。
-- `graph_src_v2/agents/assistant_agent/graph.py`：assistant 编译图（内部组合 `create_agent`）。
-- `graph_src_v2/agents/deepagent_agent/graph.py`：deepagent 编译图（内部组合 `create_deep_agent`）。
-- `graph_src_v2/runtime/context.py`：统一运行时上下文契约（含身份字段）。
-- `graph_src_v2/auth.py`：内置 demo token 与 Supabase OAuth 两种认证入口。
+- 图入口：`assistant` 与 `deepagent_demo`
+- 运行时配置：`runtime/options.py`（模型、工具、MCP 开关与参数）
+- 模型装配：`runtime/modeling.py`
+- 工具装配：`tools/registry.py`
+- MCP 清单：`mcp/servers.py`
+- 自定义路由：`custom_routes/app.py` + `custom_routes/tools.py`
+- 鉴权：`auth/provider.py`（`custom_auth` + `oauth_auth`）
 
-## 2. 启动（本地）
+## 2) 本地启动（推荐）
 
-在项目根目录运行（必须指定 v2 config）：
-
-```bash
-uv run langgraph dev --config graph_src_v2/langgraph.json --port 8123 --no-browser
-```
-
-说明：
-
-- 当前 `langgraph.json` 默认使用 `graph_src_v2/auth.py:custom_auth`。
-- 如需 OAuth，改 `auth.path` 为 `./graph_src_v2/auth.py:oauth_auth`。
-
-## 3. SDK 快速验证
-
-在项目根目录运行（示例使用 demo token）：
-
-```bash
-uv run python sdk_src/examples/langgraph_sdk_learn.py thread-search --url http://127.0.0.1:8123 --assistant-id assistant --bearer-token owner-token
-uv run python sdk_src/examples/langgraph_sdk_learn.py create-thread --url http://127.0.0.1:8123 --assistant-id assistant --bearer-token owner-token
-uv run python sdk_src/examples/langgraph_sdk_learn.py wait-run --url http://127.0.0.1:8123 --assistant-id assistant --thread-id <thread_id> --message "你好，请回复ok" --bearer-token owner-token
-```
-
-更多验证见：`graph_src_v2/docs/02-auth-and-sdk-validation.md`。
-
-## 4. 连接 `example/ui_demo`
-
-推荐走 Next.js `/api` passthrough，避免浏览器直连 `8123` 的跨域失败：
-
-1. 启动 v2 服务（不要省略 `--config`）：
+在项目根目录执行：
 
 ```bash
 uv run langgraph dev --config graph_src_v2/langgraph.json --port 8123 --no-browser
 ```
 
-2. 在 `example/ui_demo` 目录复制环境文件：
+默认行为：
+
+- 使用 `auth/provider.py:custom_auth`
+- 默认不启用本地 tools（`enable_local_tools=false`）
+- 默认不启用 MCP（`enable_local_mcp=false`）
+
+## 3) 最快可用验证路径
+
+### 3.1 直接跑测试
 
 ```bash
-cp .env.example .env
+uv run pytest graph_src_v2/tests/test_auth_core.py graph_src_v2/tests/test_custom_routes.py graph_src_v2/tests/test_model_smoke.py -q
 ```
 
-3. 启动 UI：
+### 3.2 HTTP 手工验证（不依赖外部目录）
 
 ```bash
-npm install
-npm run dev
+curl -sS http://127.0.0.1:8123/internal/capabilities/tools
+curl -sS http://127.0.0.1:8123/internal/capabilities/mcp-servers
+curl -sS -X POST http://127.0.0.1:8123/internal/capabilities/resolve -H "Content-Type: application/json" -d '{"enable_local_tools":true,"local_tools":["word_count"]}'
 ```
 
-4. 页面中使用：
+## 4) 运行时参数怎么传（最常用）
 
-- Deployment URL: `http://localhost:3000/api`
-- Assistant / Graph ID: `assistant`
-- API Key: `owner-key`（或 `viewer-key`/`admin-key`）
+你通常通过 `context` / `configurable` 传：
+
+- `model_id`
+- `enable_local_tools`
+- `local_tools`（例如 `word_count,to_upper`）
+- `enable_local_mcp`
+- `mcp_servers`（例如 `local_math,local_text`）
+- 可选模型参数：`temperature`、`max_tokens`、`top_p`
+
+说明：`model_provider/model/base_url/api_key` 不需要用户传，统一由 `conf/settings.yaml` 的模型组映射。
+
+## 5) 自定义路由（给其他服务查询能力）
+
+已暴露在同一服务下：
+
+- `GET /internal/capabilities/tools`
+- `GET /internal/capabilities/mcp-servers`
+- `POST /internal/capabilities/resolve`
+
+用途：让外部服务先查询“可用能力”与“本次请求最终会启用哪些能力”。
+
+## 6) deepagent 的约定（已简化）
+
+`deepagent_demo` 现在走官方风格薄封装：
+
+- 直接 `create_deep_agent(...)`
+- `skills` 来自 `list_deepagent_skills()`
+- `subagents` 来自 `list_subagents()`
+- 不再使用复杂的 runtime 动态 subagent 解析链
+
+## 7) 推荐开发流程（团队统一）
+
+1. 改代码前先确认目录职责，不跨层引用
+2. 改完先跑：
+   - `uv run pytest graph_src_v2/tests/test_auth_core.py graph_src_v2/tests/test_custom_routes.py graph_src_v2/tests/test_model_smoke.py -q`
+   - `uv run python -m compileall graph_src_v2`
+3. 若改了运行时行为，更新本 README 与 `01-auth-and-sdk-validation.md`
+
+## 8) 常见问题
+
+- 为什么工具没生效？
+  - 默认关闭，需显式设置 `enable_local_tools=true`。
+- 为什么 MCP 没生效？
+  - 默认关闭，需显式设置 `enable_local_mcp=true`，并传 `mcp_servers`。
+- 为什么只传了 `model_id` 就能跑？
+  - 因为模型四元组由 `settings.yaml` 统一映射。
