@@ -9,6 +9,7 @@
     "customer_support_handoffs_demo": "./graph_src_v2/agents/customer_support_agent/graph.py:graph",
     "deepagents_data_analysis_demo": "./graph_src_v2/agents/deepagents_data_analysis_agent/graph.py:graph",
     "deepagent_demo": "./graph_src_v2/agents/deepagent_agent/graph.py:graph",
+    "graph_patterns_memory_demo": "./graph_src_v2/agents/graph_patterns_memory_agent/graph.py:graph",
     "personal_assistant_demo": "./graph_src_v2/agents/personal_assistant_agent/graph.py:graph",
     "router_knowledge_base_demo": "./graph_src_v2/agents/router_knowledge_base_agent/graph.py:graph",
     "skills_sql_assistant_demo": "./graph_src_v2/agents/skills_sql_assistant_agent/graph.py:graph"

@@ -3,12 +3,16 @@ from __future__ import annotations
 from typing import Any, cast
 
 from langchain.agents import create_agent
+from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableConfig
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.config import get_config
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.runtime import Runtime
 
+from graph_src_v2.agents.assistant_agent.prompts import resolve_assistant_system_prompt
+from graph_src_v2.agents.assistant_agent.tools import build_assistant_tools, build_langchain_concepts_demo_tools
 from graph_src_v2.runtime.modeling import apply_model_runtime_params, resolve_model
 from graph_src_v2.runtime.options import (
     build_runtime_config,
@@ -18,7 +22,9 @@ from graph_src_v2.runtime.options import (
 from graph_src_v2.middlewares.message_sanitizer import MessageSanitizerMiddleware
 from graph_src_v2.middlewares.tool_error_guard import ToolErrorGuardMiddleware
 from graph_src_v2.runtime.context import RuntimeContext
-from graph_src_v2.tools.registry import build_tools
+
+
+_ASSISTANT_HITL_CHECKPOINTER = InMemorySaver()
 
 
 def _is_model_credential_error(exc: BaseException) -> bool:
@@ -120,25 +126,49 @@ async def _run_assistant(
     runtime_context = merge_trusted_auth_context(config, context_to_mapping(runtime.context))
     options = build_runtime_config(config, runtime_context)
 
-    tools = await build_tools(options)
-    middleware = cast(list[Any], [MessageSanitizerMiddleware(), ToolErrorGuardMiddleware()])
+    demo_enabled = True
+
     model = apply_model_runtime_params(
         resolve_model(options.model_spec),
         options,
     )
+    tools = await build_assistant_tools(options)
+    if demo_enabled:
+        tools.extend(build_langchain_concepts_demo_tools(model))
+
+    middleware = cast(
+        list[Any],
+        [
+            MessageSanitizerMiddleware(),
+            ToolErrorGuardMiddleware(),
+            HumanInTheLoopMiddleware(
+                interrupt_on={
+                    "request_human_approval": {
+                        "allowed_decisions": ["approve", "edit", "reject"],
+                    },
+                    "send_demo_email": {
+                        "allowed_decisions": ["approve", "edit", "reject"],
+                    },
+                },
+                description_prefix="Tool execution pending approval",
+            ),
+        ],
+    )
+    system_prompt = resolve_assistant_system_prompt(options.system_prompt, demo_enabled)
 
     agent_graph = create_agent(
         model=model,
         tools=tools,
         middleware=middleware,
-        system_prompt=options.system_prompt,
+        system_prompt=system_prompt,
         context_schema=RuntimeContext,
         name="assistant",
+        checkpointer=_ASSISTANT_HITL_CHECKPOINTER,
     )
 
     try:
         result = await agent_graph.ainvoke(
-            cast(dict[str, Any], {"messages": state.get("messages", [])}),
+            cast(Any, {"messages": state.get("messages", [])}),
             config=config,
             context=runtime.context,
         )

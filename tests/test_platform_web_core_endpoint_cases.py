@@ -28,10 +28,10 @@ def _message_texts_from_state(state: Any) -> list[str]:
 
 
 def _log(message: str) -> None:
-    print(f"[UI-DEMO-CORE] {message}")
+    print(f"[PLATFORM-WEB-CORE] {message}")
 
 
-def test_ui_demo_core_endpoint_cases() -> None:
+def test_platform_web_core_endpoint_cases() -> None:
     # Given: 默认连接到本地 LangGraph 服务，assistant_id 为 agent。
     # 这些环境变量与现有测试保持一致，便于在 CI/本地复用。
     url = os.getenv("LANGGRAPH_API_URL", "http://127.0.0.1:8123")
@@ -54,7 +54,7 @@ def test_ui_demo_core_endpoint_cases() -> None:
             # When: 创建 thread 并按 metadata 搜索。
             # Then: 能检索回刚创建的 thread，证明 /threads 与 /threads/search 路径可用。
             _log("Step 2/6 创建 thread 并校验 threads.search")
-            tag = f"ui-demo-core-{uuid.uuid4().hex[:8]}"
+            tag = f"platform-web-core-{uuid.uuid4().hex[:8]}"
             thread = await client.threads.create(metadata={"tag": tag, "graph_id": assistant_id})
             thread_id = str(_as_mapping(thread).get("thread_id", ""))
             assert thread_id
