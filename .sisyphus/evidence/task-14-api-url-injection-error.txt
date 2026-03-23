@@ -1,0 +1,2 @@
+status=400
+body={"code":"http_error","message":"1 validation error:\n  {'type': 'extra_forbidden', 'loc': ('body', 'api_url'), 'msg': 'Extra inputs are not permitted', 'input': 'http://evil'}\n\n  File \"/Users/bytedance/PycharmProjects/test2/langgraph_sdk_teach/platform-core/platform_core/app/main.py\", line 417, in create_thread\n    POST /threads","trace_id":"7fd1e40c-b027-45ef-b9e1-89007537aa61"}

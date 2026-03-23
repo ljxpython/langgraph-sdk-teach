@@ -1,0 +1,2 @@
+create_thread_http_code=200
+{"thread_id":"737e3f9e-7022-4486-b8a4-ea80fc3fb236","created_at":"2026-02-26T11:25:19.786390+00:00","metadata":{"assistant_id":"agent","platform_session_id":"cc6b40d0-657a-4243-85fa-372453f59050"}}

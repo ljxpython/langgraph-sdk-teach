@@ -1,0 +1,2 @@
+status=404
+body={"code":"http_error","message":"Thread not found","trace_id":"8a24df48-0149-4acc-bf7f-7a8fcdbb1742"}

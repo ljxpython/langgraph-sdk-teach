@@ -725,7 +725,11 @@ export function ObserverPage() {
     )
     const recoveredInterrupt = extractInterruptPayload(stateResp.state)
     const baseItems = mapMessageToChatItems(messagesResp.items)
-    setChatItems(recoveredInterrupt != null ? [...baseItems, buildInterruptChatItem(recoveredInterrupt)] : baseItems)
+    setChatItems(
+      recoveredInterrupt != null
+        ? [...baseItems, buildInterruptChatItem(recoveredInterrupt, nonInterruptMessageCount(baseItems))]
+        : baseItems,
+    )
     setMessageOffset(messagesResp.items.length)
     setHasMoreMessages(messagesResp.items.length === MESSAGE_PAGE_SIZE)
     setStateSnapshot(stateResp.state)
@@ -944,7 +948,7 @@ export function ObserverPage() {
         if (finalDraft) {
           next.push({ id: messageId('ai-final'), role: 'ai', text: finalDraft })
         }
-        next.push(buildInterruptChatItem(interrupt))
+        next.push(buildInterruptChatItem(interrupt, nonInterruptMessageCount(next)))
         return next
       })
       if (finalDraft) {
@@ -1102,7 +1106,11 @@ export function ObserverPage() {
     interruptCapturedRef.current = nextInterrupt != null
     setInterruptPayload(nextInterrupt)
     if (nextInterrupt != null) {
-      setChatItems((prev) => [...markInterruptItemsResolved(prev), buildInterruptChatItem(nextInterrupt)])
+      setChatItems((prev) => {
+        const next = [...markInterruptItemsResolved(prev)]
+        next.push(buildInterruptChatItem(nextInterrupt, nonInterruptMessageCount(next)))
+        return next
+      })
     }
     setStage(nextInterrupt != null ? 'human_review_required' : 'run_done')
     appendTimeline({ ts: nowLabel(), category: 'run_terminal', event: 'resume', summary: 'resume called' })

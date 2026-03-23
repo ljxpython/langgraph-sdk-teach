@@ -1,0 +1,15 @@
+{
+  "run_logs": [
+    {
+      "trace_id": "a7802791-adf9-4ae4-9060-34296ee26106",
+      "tenant_id": "tenantA",
+      "user_id": "user1",
+      "platform_session_id": "f7ecf6e2-6e67-44a9-ad4d-627218bd67bc",
+      "thread_id": "8695375b-c73b-4821-b7d2-1d476c3ff617",
+      "run_id": "4dcf16ee-ea1f-421b-995b-eed4ad7e558c",
+      "status": "completed",
+      "latency": 1,
+      "created_at": "2026-02-26T11:26:58.400149+00:00"
+    }
+  ]
+}

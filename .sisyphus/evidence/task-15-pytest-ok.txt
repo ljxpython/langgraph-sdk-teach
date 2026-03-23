@@ -1,0 +1,22 @@
+........                                                                 [100%]
+=============================== warnings summary ===============================
+platform-core/tests/test_platform_core_api.py::test_requires_authentication
+  /Users/bytedance/PycharmProjects/test2/langgraph_sdk_teach/platform-core/platform_core/app/main.py:372: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+platform-core/tests/test_platform_core_api.py::test_requires_authentication
+  /Users/bytedance/PycharmProjects/test2/langgraph_sdk_teach/.venv/lib/python3.13/site-packages/fastapi/applications.py:4573: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 2 warnings in 5.85s
